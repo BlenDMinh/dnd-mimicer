@@ -1,1 +1,1 @@
-# dnd-mimicer
+# Mimicer - DnD Utility Bot for Discord
