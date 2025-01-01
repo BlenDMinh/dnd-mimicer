@@ -1,0 +1,27 @@
+services:
+  api-server:
+    container_name: mimicer-api-server
+    build: ./mimicer-api-server
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - API_KEY=secret
+      - DATABASE_URL=postgres://postgres:password@database:5432/mimicer-db
+  database:
+    container_name: mimicer-db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mimicer-db
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "mimicer-db"]
+      interval: 30s
+      retries: 5
+      start_period: 30s
+      timeout: 10s

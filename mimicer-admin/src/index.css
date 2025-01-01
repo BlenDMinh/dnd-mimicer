@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.modal {
+  margin: 0; /* Remove margin */
+}
