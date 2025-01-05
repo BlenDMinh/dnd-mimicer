@@ -4,7 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import create_db_and_tables
 from app.dependencies import api_key_validation
-from app.routers import channel, cronjob, user
+from app.routers import channel, cronjob, user, dndbeyond, interactions
+
+import env
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,8 +31,10 @@ app.add_middleware(
 app.include_router(user.router)
 app.include_router(cronjob.router)
 app.include_router(channel.router)
+app.include_router(dndbeyond.router)
+app.include_router(interactions.router)
 
 # Run the FastAPI app
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=env.API_PORT)
