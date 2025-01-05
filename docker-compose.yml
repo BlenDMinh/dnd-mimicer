@@ -45,3 +45,11 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
+  admin-client:
+    container_name: mimicer-admin-client
+    build: ./mimicer-admin
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://api-server:8000
+      - VITE_API_KEY=${API_KEY}
