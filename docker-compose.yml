@@ -1,4 +1,9 @@
 services:
+  admin-web:
+    container_name: mimicer-admin
+    build: ./mimicer-admin
+    ports:
+      - "3000:3000"
   api-server:
     container_name: mimicer-api-server
     build: ./mimicer-api-server
