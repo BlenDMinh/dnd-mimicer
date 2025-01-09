@@ -1,25 +1,18 @@
-# Use an official Node.js runtime as a parent image
-FROM node:16-alpine
-
-# Set the working directory
+FROM node:22-alpine AS builder
 WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
+COPY package.json yarn.lock* ./
+RUN yarn install --frozen-lockfile
 COPY . .
+RUN yarn vite build
 
-RUN ls -la /app
+# Run Stage (Using Nginx)
+FROM nginx:alpine AS runner
+WORKDIR /app
+COPY --from=builder /app/dist /var/www/html
 
-# Build the application
-RUN npm run build
+# Copy the custom NGINX configuration
+COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 
-# Expose the port the app runs on
-EXPOSE 8080
-
-# Command to run the Vite development server
-CMD ["npm", "run", "dev"]
+# Expose the port and start NGINX
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

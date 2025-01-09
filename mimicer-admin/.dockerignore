@@ -1,14 +1,1 @@
 node_modules
-dist
-.vscode
-.DS_Store
-.env
-*.log
-*.lock
-.idea
-*.iml
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?

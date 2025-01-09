@@ -12,21 +12,49 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - API_KEY=secret
-      - DATABASE_URL=postgres://postgres:password@database:5432/mimicer-db
+      - API_KEY=${API_KEY}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - DISCORD_API_URL=${DISCORD_API_URL}
+      - ANNOUCEMENT_CHANNEL_ID=${ANNOUCEMENT_CHANNEL_ID}
+      - CAMPAIGN_CHANNEL_ID=${CAMPAIGN_CHANNEL_ID}
   database:
     container_name: mimicer-db
-    image: postgres:latest
+    image: postgres:17.2-alpine3.21
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=mimicer-db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "mimicer-db"]
+      test:
+        ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 30s
       retries: 5
       start_period: 30s
       timeout: 10s
+  redis:
+    container_name: mimicer-redis
+    image: redis:7.4.1-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+  admin-client:
+    container_name: mimicer-admin-client
+    build: ./mimicer-admin
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://api-server:8000
+      - VITE_API_KEY=${API_KEY}
