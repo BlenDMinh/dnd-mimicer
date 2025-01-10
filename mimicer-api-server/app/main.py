@@ -18,6 +18,7 @@ async def lifespan(app: FastAPI):
     print("Application shutdown!")
 
 app = FastAPI(dependencies=[Depends(api_key_validation)], lifespan=lifespan)
+print(env.DB_URL)
 
 # CORS configuration to allow localhost
 app.add_middleware(
@@ -37,4 +38,4 @@ app.include_router(interactions.router)
 # Run the FastAPI app
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=env.API_PORT)
+    uvicorn.run(app, host="127.0.0.1", port=env.API_PORT, reload=True)

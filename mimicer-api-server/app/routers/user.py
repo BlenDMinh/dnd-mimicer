@@ -5,24 +5,33 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 from app.models import User
-from app.schematics import UpdateBatchUserSchema, UserSchema
+from app.schematics import UpdateBatchUserSchema, UserSchema, UserInputSchema, UserLogInSchema
 from app.database import SessionDep
+from app.services import user as UserService
 
 
 router = APIRouter(prefix='/users', tags=['user'])
 
 @router.post("")
-async def create_user(user: UserSchema, db: SessionDep):
+async def create_user(user_input: UserInputSchema, db: SessionDep):
+    user = User(**user_input.model_dump())
+    print('user', user.__repr__())
     db.add(user)
     db.commit()
     db.refresh(user)
-    return user
+    return UserService.get_access_token(user)
 
 @router.get("", response_model=list[UserSchema])
 async def get_users(db: SessionDep):
     users = db.query(User).all()
     print(users)
     return users
+
+@router.post("/login")
+async def login_user(user_login: UserLogInSchema, db: SessionDep):
+    return UserService.login(db,user_login.username,user_login.password)
+
+
 
 @router.delete("/{user_id}")
 async def delete_user(user_id: int, db: SessionDep):

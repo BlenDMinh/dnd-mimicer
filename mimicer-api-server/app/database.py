@@ -15,6 +15,7 @@ Base = declarative_base()
 
 def create_db_and_tables():
     Base.metadata.create_all(bind=engine)
+    print('Database generated')
 
 def get_db():
     db = SessionLocal()
