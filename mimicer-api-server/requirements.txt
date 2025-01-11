@@ -8,3 +8,4 @@ redis[hiredis]
 requests
 passlib[bcrypt]
 pyjwt==1.7.1
+psycopg2-binary

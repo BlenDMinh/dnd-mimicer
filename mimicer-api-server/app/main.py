@@ -20,10 +20,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(dependencies=[Depends(api_key_validation)], lifespan=lifespan)
 print(env.DB_URL)
 
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
 # CORS configuration to allow localhost
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "http://localhost:3000", "http://localhost:5173"],  # Add any other origins you want to allow
+    allow_origins=["http://localhost", "http://localhost:3000", "http://localhost:5173", "https://a84a28b65ff1088ee029c3bbff91141b.serveo.net"],  # Add any other origins you want to allow
     allow_credentials=True,
     allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allows all headers
