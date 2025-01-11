@@ -24,6 +24,9 @@ async def start_cron():
     
     # Initialize the next run times for each cron job
     for cronjob in cronjobs:
+        if cronjob['function'] not in function_map:
+            logger.error(f"Function {cronjob['function']} not found in function map")
+            continue
         cronjob = (cronjob['cron_expression'], function_map[cronjob['function']])
         logger.info(f"Scheduling {cronjob[1].__name__} with cron expression {cronjob[0]}")
         if cronjob[0] == 'secondly':
@@ -46,6 +49,9 @@ async def start_cron():
                     next_run_times[task_name] = datetime.now() + timedelta(seconds=1)
                 else:
                     current_time = datetime.now()
+                    iter = croniter(cronjob[0], current_time)
+                    if task_name not in next_run_times:
+                        next_run_times[task_name] = iter.get_next(datetime)
                     next_run_time = next_run_times[task_name]
 
                     if current_time >= next_run_time:
@@ -53,7 +59,6 @@ async def start_cron():
                         await cronjob[1]()  # Execute the task
 
                         # Update the next run time
-                        iter = croniter(cronjob[0], current_time)
                         next_run_times[task_name] = iter.get_next(datetime)
 
             except Exception as e:
