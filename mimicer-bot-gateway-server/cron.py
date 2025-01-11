@@ -5,6 +5,7 @@ import asyncio
 import crontask.metadata
 import crontask.test
 import crontask.dnd
+from api import CronJobApi
 
 logger = logging.getLogger('discord.cron')
 
@@ -16,16 +17,14 @@ function_map = {
     'dnd.create_poll': crontask.dnd.create_poll,
 }
 
-cronjobs = [
-    ('* * * * *', crontask.metadata.fetch_user),
-    ('* * * * *', crontask.metadata.fetch_channel),
-]
-
 async def start_cron():
     logger.info('Starting cronjobs')
+    cronjobs = CronJobApi.get_cronjobs()
+    logger.info(f'Fetched cronjobs: {cronjobs}')
     
     # Initialize the next run times for each cron job
     for cronjob in cronjobs:
+        cronjob = (cronjob['cron_expression'], function_map[cronjob['function']])
         logger.info(f"Scheduling {cronjob[1].__name__} with cron expression {cronjob[0]}")
         if cronjob[0] == 'secondly':
             next_run_times[cronjob[1].__name__] = datetime.now()
@@ -34,8 +33,11 @@ async def start_cron():
             next_run_times[cronjob[1].__name__] = iter.get_next(datetime)
 
     while True:
-        
+        logger.info(f'Updating cronjobs...')
+        cronjobs = CronJobApi.get_cronjobs()
+        logger.info(f'Found {len(cronjobs)} cronjobs')
         for cronjob in cronjobs:
+            cronjob = (cronjob['cron_expression'], function_map[cronjob['function']])
             task_name = cronjob[1].__name__
             try:
                 if cronjob[0] == 'secondly':
@@ -55,6 +57,7 @@ async def start_cron():
                         next_run_times[task_name] = iter.get_next(datetime)
 
             except Exception as e:
+                print(e)
                 logger.error(f"Error occurred while running {task_name}: {e}")
                 # Continue with the next cronjob, do not stop the entire process.
                 continue

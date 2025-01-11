@@ -6,3 +6,4 @@ python-dotenv
 sqlalchemy
 redis[hiredis]
 requests
+psycopg2-binary

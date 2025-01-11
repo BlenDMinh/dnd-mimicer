@@ -1,17 +1,25 @@
+# Build Stage
 FROM node:22-alpine AS builder
 WORKDIR /app
-COPY package.json yarn.lock* ./
-RUN yarn install --frozen-lockfile
+
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# Copy and install dependencies using pnpm
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Copy application code and build
 COPY . .
-RUN yarn vite build
+RUN pnpm build
 
 # Run Stage (Using Nginx)
 FROM nginx:alpine AS runner
 WORKDIR /app
-COPY --from=builder /app/dist /var/www/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy the custom NGINX configuration
-COPY nginx.conf /etc/nginx/conf.d/nginx.conf
+COPY ./ci/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose the port and start NGINX
 EXPOSE 80
