@@ -11,7 +11,6 @@ def authenticate(db: Session,username:str, password: str):
             User.display_name == username
         )
     ).first()
-    print(user)
     if user and hasher.verify_password(password,user.password):
             return user
     raise Exception("wrong username or password") 
@@ -21,8 +20,8 @@ def login(db:Session, username:str, password: str):
     if result:
         return get_access_token(result)
     else:
-        return result
-    
+        return result     
+
 def get_access_token(user: User):
     if user:
         return jwt_token.create_access_token(user)
