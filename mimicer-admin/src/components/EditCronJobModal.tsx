@@ -11,7 +11,9 @@ interface EditCronJobModalProps {
 
 const EditCronJobModal: React.FC<EditCronJobModalProps> = ({
   isOpen,
+  // @ts-ignore
   editingJob,
+  // @ts-ignore
   setEditingJob,
   handleUpdate,
   closeModal,

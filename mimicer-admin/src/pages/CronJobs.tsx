@@ -92,7 +92,7 @@ const CronJobs: React.FC = () => {
     )
       .then((res) => res.json())
       .then((data) =>
-        data.map((job) => ({
+        data.map((job:any) => ({
           id: job.id,
           expression: job.cron_expression,
           functionName: job.function,

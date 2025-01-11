@@ -5,6 +5,16 @@ class DiscordApiClient:
     def __init__(self, token: str):
         self.token = token
 
+    def get_oauth_url():
+        url = (
+            f"https://discord.com/oauth2/authorize"
+            f"?client_id={env.DISCORD_CLIENT_ID}"
+            f"&response_type=code"
+            f"&scope=identify"
+        )
+        return url 
+        
+
     def make_request(self, url: str, method: str = "GET", data: dict = None):
         print(f"Making {method} request to {url}")
         headers = {
