@@ -9,6 +9,11 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
+ARG VITE_API_HOST
+ARG VITE_API_KEY
+RUN echo "VITE_API_HOST=$VITE_API_HOST" > .env && \
+    echo "VITE_API_KEY=$VITE_API_KEY" >> .env
+
 # Copy application code and build
 COPY . .
 RUN pnpm build
@@ -17,12 +22,6 @@ RUN pnpm build
 FROM nginx:alpine AS runner
 WORKDIR /app
 COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copy the custom NGINX configuration
-COPY ./ci/nginx.conf /etc/nginx/conf.d/default.conf
-# Copy SSL certificate files (your certificate and key files)
-COPY ./ci/ec2.crt /etc/ssl/certs/ec2.crt
-COPY ./ci/ec2.key /etc/ssl/private/ec2.key
 
 # Expose the port and start NGINX
 EXPOSE 80
