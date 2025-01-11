@@ -1,7 +1,12 @@
 services:
   mimicer-client:
     container_name: mimicer-client
-    build: ./mimicer-admin
+    build:
+      context: ./mimicer-admin
+      dockerfile: Dockerfile
+      args:
+        VITE_API_HOST: ${VITE_API_HOST}
+        VITE_API_KEY: ${VITE_API_KEY}
     ports:
       - "80:80"
       - "443:443"
