@@ -40,6 +40,9 @@ async def start_cron():
         cronjobs = CronJobApi.get_cronjobs()
         logger.info(f'Found {len(cronjobs)} cronjobs')
         for cronjob in cronjobs:
+            if cronjob['function'] not in function_map:
+                logger.error(f"Function {cronjob['function']} not found in function map")
+                continue
             cronjob = (cronjob['cron_expression'], function_map[cronjob['function']])
             task_name = cronjob[1].__name__
             try:
