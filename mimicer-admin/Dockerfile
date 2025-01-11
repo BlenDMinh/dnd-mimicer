@@ -20,6 +20,9 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy the custom NGINX configuration
 COPY ./ci/nginx.conf /etc/nginx/conf.d/default.conf
+# Copy SSL certificate files (your certificate and key files)
+COPY ./ci/ec2.crt /etc/ssl/certs/ec2.crt
+COPY ./ci/ec2.key /etc/ssl/private/ec2.key
 
 # Expose the port and start NGINX
 EXPOSE 80
